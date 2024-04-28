@@ -14,18 +14,19 @@
 	let OpenAIUrl = '';
 	let OpenAIKey = '';
 
-	let STTEngines = ['', 'openai'];
+	let STTEngines = ['', 'openai', 'papareo'];
 	let STTEngine = '';
 
 	let conversationMode = false;
 	let speechAutoSend = false;
 	let responseAutoPlayback = false;
 
-	let TTSEngines = ['', 'openai'];
+	let TTSEngines = ['', 'openai', 'papareo'];
 	let TTSEngine = '';
 
 	let voices = [];
 	let speaker = '';
+	let api_token = '';
 
 	const getOpenAIVoices = () => {
 		voices = [
@@ -36,6 +37,10 @@
 			{ name: 'nova' },
 			{ name: 'shimmer' }
 		];
+	};
+
+	const getPapaReoVoices = () => {
+		voices = [{ name: 'pita' }];
 	};
 
 	const getWebAPIVoices = () => {
@@ -98,9 +103,12 @@
 		STTEngine = settings?.audio?.STTEngine ?? '';
 		TTSEngine = settings?.audio?.TTSEngine ?? '';
 		speaker = settings?.audio?.speaker ?? '';
+		api_token = settings?.audio?.api_token ?? localStorage.token;
 
 		if (TTSEngine === 'openai') {
 			getOpenAIVoices();
+		} else if (TTSEngine === 'papareo') {
+			getPapaReoVoices();
 		} else {
 			getWebAPIVoices();
 		}
@@ -126,7 +134,8 @@
 			audio: {
 				STTEngine: STTEngine !== '' ? STTEngine : undefined,
 				TTSEngine: TTSEngine !== '' ? TTSEngine : undefined,
-				speaker: speaker !== '' ? speaker : undefined
+				speaker: speaker !== '' ? speaker : undefined,
+				api_token: api_token !== '' ? api_token : undefined
 			}
 		});
 		dispatch('save');
@@ -158,9 +167,23 @@
 					>
 						<option value="">{$i18n.t('Default (Web API)')}</option>
 						<option value="whisper-local">{$i18n.t('Whisper (Local)')}</option>
+						<option value="papareo">{$i18n.t('Papa Reo API')}</option>
 					</select>
 				</div>
 			</div>
+
+			{#if $user.role === 'admin'}
+				{#if STTEngine === 'papareo'}
+					<div class="mt-1 flex gap-2 mb-1">
+						<input
+							class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
+							placeholder={$i18n.t('API Token')}
+							bind:value={api_token}
+							required
+						/>
+					</div>
+				{/if}
+			{/if}
 
 			<div class=" py-0.5 flex w-full justify-between">
 				<div class=" self-center text-xs font-medium">{$i18n.t('Conversation Mode')}</div>
@@ -215,6 +238,9 @@
 							if (e.target.value === 'openai') {
 								getOpenAIVoices();
 								speaker = 'alloy';
+							} else if (e.target.value === 'papareo') {
+								getPapaReoVoices();
+								speaker = 'pita';
 							} else {
 								getWebAPIVoices();
 								speaker = '';
@@ -223,6 +249,7 @@
 					>
 						<option value="">{$i18n.t('Default (Web API)')}</option>
 						<option value="openai">{$i18n.t('Open AI')}</option>
+						<option value="papareo">{$i18n.t('Papa Reo API')}</option>
 					</select>
 				</div>
 			</div>
@@ -241,6 +268,16 @@
 							class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
 							placeholder={$i18n.t('API Key')}
 							bind:value={OpenAIKey}
+							required
+						/>
+					</div>
+				{/if}
+				{#if TTSEngine === 'papareo'}
+					<div class="mt-1 flex gap-2 mb-1">
+						<input
+							class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
+							placeholder={$i18n.t('API Token')}
+							bind:value={api_token}
 							required
 						/>
 					</div>

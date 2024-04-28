@@ -11,7 +11,7 @@
 	import { SUPPORTED_FILE_TYPE, SUPPORTED_FILE_EXTENSIONS } from '$lib/constants';
 	import Documents from './MessageInput/Documents.svelte';
 	import Models from './MessageInput/Models.svelte';
-	import { transcribeAudio } from '$lib/apis/audio';
+	import { transcribeAudio, transcribePapaReo } from '$lib/apis/audio';
 	import Tooltip from '../common/Tooltip.svelte';
 
 	const i18n = getContext('i18n');
@@ -78,11 +78,16 @@
 
 			const file = blobToFile(audioBlob, 'recording.wav');
 
-			const res = await transcribeAudio(localStorage.token, file).catch((error) => {
+			let transcriptionEngine = transcribeAudio;
+			if ($settings?.audio?.STTEngine === 'papareo') {
+				transcriptionEngine = transcribePapaReo;
+			}
+
+			const res = await transcriptionEngine($settings?.audio?.api_token, file).catch((error) => {
 				toast.error(error);
 				return null;
 			});
-
+			console.log(res);
 			if (res) {
 				prompt = res.text;
 				await tick();
@@ -236,7 +241,11 @@
 			files = [...files, doc];
 
 			if (['audio/mpeg', 'audio/wav'].includes(file['type'])) {
-				const res = await transcribeAudio(localStorage.token, file).catch((error) => {
+				let transcriptionEngine = transcribeAudio;
+				if ($settings?.audio?.STTEngine === 'papareo') {
+					transcriptionEngine = transcribePapaReo;
+				}
+				const res = await transcriptionEngine($settings?.audio?.api_token, file).catch((error) => {
 					toast.error(error);
 					return null;
 				});
@@ -684,8 +693,8 @@
 							placeholder={chatInputPlaceholder !== ''
 								? chatInputPlaceholder
 								: isRecording
-								? $i18n.t('Listening...')
-								: $i18n.t('Send a Message')}
+									? $i18n.t('Listening...')
+									: $i18n.t('Send a Message')}
 							bind:value={prompt}
 							on:keypress={(e) => {
 								if (e.keyCode == 13 && !e.shiftKey) {

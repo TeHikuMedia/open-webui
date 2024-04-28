@@ -128,3 +128,83 @@ export const synthesizeOpenAISpeech = async (
 
 	return res;
 };
+
+export const synthesizePapaReo = async (
+	token: string = '',
+	speaker: string = 'pita',
+	text: string = ''
+) => {
+	let error = null;
+
+	const res = await fetch(`https://api.papareo.io/reo/synthesize`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Token ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			speed: 1,
+			text: text,
+			voice_id: speaker,
+			response_type: "stream"
+		})
+	})
+		.then(async (res) => {
+			if (!res.ok) throw await res.json();
+			return res;
+		})
+		.catch((err) => {
+			error = err.detail;
+			console.log(err);
+
+			return null;
+		});
+
+	if (error) {
+		throw error;
+	}
+
+	return res;
+};
+
+
+type PapaReoAPITranscribePayload = {
+	transcription: string;
+}
+
+export const transcribePapaReo = async (token: string, file: File) => {
+	const data = new FormData();
+	data.append('audio_file', file);
+
+	let error = null;
+	const res = await fetch(`https://api.papareo.io/tuhi/transcribe`, {
+		method: 'POST',
+		headers: {
+			Accept: 'application/json',
+			authorization: `Token ${token}`
+		},
+		body: data
+	})
+		.then(async (res) => {
+			if (!res.ok) throw await res.json();
+			const data = await res.json() as any as PapaReoAPITranscribePayload
+			if (data.transcription === '') throw { text: "I couldn't understand you." }
+			console.log(data)
+			const result = {
+				...data,
+				text: data.transcription
+			};
+			return result;
+		})
+		.catch((err) => {
+			error = err.detail;
+			console.log(err);
+			return null;
+		});
+
+	if (error) {
+		throw error;
+	}
+
+	return res;
+};

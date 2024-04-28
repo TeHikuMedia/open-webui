@@ -15,7 +15,7 @@
 	const dispatch = createEventDispatcher();
 
 	import { config, settings } from '$lib/stores';
-	import { synthesizeOpenAISpeech } from '$lib/apis/audio';
+	import { synthesizeOpenAISpeech, synthesizePapaReo } from '$lib/apis/audio';
 	import { imageGenerations } from '$lib/apis/images';
 	import {
 		approximateToHumanReadable,
@@ -188,7 +188,7 @@
 		} else {
 			speaking = true;
 
-			if ($settings?.audio?.TTSEngine === 'openai') {
+			if ($settings?.audio?.TTSEngine === 'openai' || $settings?.audio?.TTSEngine === 'papareo') {
 				loadingSpeech = true;
 
 				const sentences = extractSentences(message.content).reduce((mergedTexts, currentText) => {
@@ -217,8 +217,12 @@
 				let lastPlayedAudioPromise = Promise.resolve(); // Initialize a promise that resolves immediately
 
 				for (const [idx, sentence] of sentences.entries()) {
-					const res = await synthesizeOpenAISpeech(
-						localStorage.token,
+					let speechAPI = synthesizeOpenAISpeech;
+					if ($settings?.audio?.TTSEngine === 'papareo') {
+						speechAPI = synthesizePapaReo;
+					}
+					const res = await speechAPI(
+						$settings?.audio?.api_token,
 						$settings?.audio?.speaker,
 						sentence
 					).catch((error) => {
