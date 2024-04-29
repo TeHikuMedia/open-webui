@@ -43,6 +43,7 @@ from config import (
     DEVICE_TYPE,
     AUDIO_OPENAI_API_BASE_URL,
     AUDIO_OPENAI_API_KEY,
+    PAPAREO_TOKEN
 )
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ app.add_middleware(
 
 app.state.OPENAI_API_BASE_URL = AUDIO_OPENAI_API_BASE_URL
 app.state.OPENAI_API_KEY = AUDIO_OPENAI_API_KEY
+app.state.PAPAREO_TOKEN = PAPAREO_TOKEN
 
 # setting device type for whisper model
 whisper_device_type = DEVICE_TYPE if DEVICE_TYPE and DEVICE_TYPE == "cuda" else "cpu"
@@ -72,6 +74,7 @@ SPEECH_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 class OpenAIConfigUpdateForm(BaseModel):
     url: str
     key: str
+    papareo_token: str
 
 
 @app.get("/config")
@@ -79,6 +82,7 @@ async def get_openai_config(user=Depends(get_admin_user)):
     return {
         "OPENAI_API_BASE_URL": app.state.OPENAI_API_BASE_URL,
         "OPENAI_API_KEY": app.state.OPENAI_API_KEY,
+        "PAPAREO_TOKEN": app.state.PAPAREO_TOKEN,
     }
 
 
@@ -87,15 +91,18 @@ async def update_openai_config(
     form_data: OpenAIConfigUpdateForm, user=Depends(get_admin_user)
 ):
     if form_data.key == "":
-        raise HTTPException(status_code=400, detail=ERROR_MESSAGES.API_KEY_NOT_FOUND)
+        raise HTTPException(
+            status_code=400, detail=ERROR_MESSAGES.API_KEY_NOT_FOUND)
 
     app.state.OPENAI_API_BASE_URL = form_data.url
     app.state.OPENAI_API_KEY = form_data.key
+    app.state.PAPAREO_TOKEN = form_data.papareo_token
 
     return {
         "status": True,
         "OPENAI_API_BASE_URL": app.state.OPENAI_API_BASE_URL,
         "OPENAI_API_KEY": app.state.OPENAI_API_KEY,
+        "PAPAREO_TOKEN": app.state.PAPAREO_TOKEN
     }
 
 

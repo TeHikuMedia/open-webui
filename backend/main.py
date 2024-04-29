@@ -19,6 +19,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from apps.ollama.main import app as ollama_app
 from apps.openai.main import app as openai_app
+from apps.papareo.main import app as papareo_app
 
 from apps.litellm.main import (
     app as litellm_app,
@@ -74,15 +75,15 @@ class SPAStaticFiles(StaticFiles):
 
 print(
     f"""
-  ___                    __        __   _     _   _ ___ 
+  ___                    __        __   _     _   _ ___
  / _ \ _ __   ___ _ __   \ \      / /__| |__ | | | |_ _|
-| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || | 
-| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || | 
+| | | | '_ \ / _ \ '_ \   \ \ /\ / / _ \ '_ \| | | || |
+| |_| | |_) |  __/ | | |   \ V  V /  __/ |_) | |_| || |
  \___/| .__/ \___|_| |_|    \_/\_/ \___|_.__/ \___/|___|
-      |_|                                               
+      |_|
 
-      
-v{VERSION} - building the best open-source AI user interface.      
+
+v{VERSION} - building the best open-source AI user interface.
 https://github.com/open-webui/open-webui
 """
 )
@@ -184,6 +185,7 @@ app.mount("/litellm/api", litellm_app)
 
 app.mount("/ollama", ollama_app)
 app.mount("/openai/api", openai_app)
+app.mount("/papareo/api", papareo_app)
 
 app.mount("/images/api/v1", images_app)
 app.mount("/audio/api/v1", audio_app)

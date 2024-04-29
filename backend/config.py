@@ -124,7 +124,8 @@ changelog_json = {}
 
 # Iterate over each version
 for version in soup.find_all("h2"):
-    version_number = version.get_text().strip().split(" - ")[0][1:-1]  # Remove brackets
+    version_number = version.get_text().strip().split(
+        " - ")[0][1:-1]  # Remove brackets
     date = version.get_text().strip().split(" - ")[1]
 
     version_data = {"date": date}
@@ -165,7 +166,8 @@ except:
 
 STATIC_DIR = str(Path(os.getenv("STATIC_DIR", "./static")).resolve())
 
-shutil.copyfile(f"{FRONTEND_BUILD_DIR}/favicon.png", f"{STATIC_DIR}/favicon.png")
+shutil.copyfile(f"{FRONTEND_BUILD_DIR}/favicon.png",
+                f"{STATIC_DIR}/favicon.png")
 
 ####################################
 # CUSTOM_NAME
@@ -175,7 +177,8 @@ CUSTOM_NAME = os.environ.get("CUSTOM_NAME", "")
 
 if CUSTOM_NAME:
     try:
-        r = requests.get(f"https://api.openwebui.com/api/v1/custom/{CUSTOM_NAME}")
+        r = requests.get(
+            f"https://api.openwebui.com/api/v1/custom/{CUSTOM_NAME}")
         data = r.json()
         if r.ok:
             if "logo" in data:
@@ -376,13 +379,15 @@ USER_PERMISSIONS_CHAT_DELETION = (
 USER_PERMISSIONS = {"chat": {"deletion": USER_PERMISSIONS_CHAT_DELETION}}
 
 
-MODEL_FILTER_ENABLED = os.environ.get("MODEL_FILTER_ENABLED", "False").lower() == "true"
+MODEL_FILTER_ENABLED = os.environ.get(
+    "MODEL_FILTER_ENABLED", "False").lower() == "true"
 MODEL_FILTER_LIST = os.environ.get("MODEL_FILTER_LIST", "")
 MODEL_FILTER_LIST = [model.strip() for model in MODEL_FILTER_LIST.split(";")]
 
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "")
 
-ENABLE_ADMIN_EXPORT = os.environ.get("ENABLE_ADMIN_EXPORT", "True").lower() == "true"
+ENABLE_ADMIN_EXPORT = os.environ.get(
+    "ENABLE_ADMIN_EXPORT", "True").lower() == "true"
 
 ####################################
 # WEBUI_VERSION
@@ -428,7 +433,8 @@ RAG_EMBEDDING_MODEL = os.environ.get(
 log.info(f"Embedding model set: {RAG_EMBEDDING_MODEL}"),
 
 RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE = (
-    os.environ.get("RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE", "").lower() == "true"
+    os.environ.get("RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE",
+                   "").lower() == "true"
 )
 
 # device type embedding models - "cpu" (default), "cuda" (nvidia gpu required) or "mps" (apple silicon) - choosing this right can lead to better performance
@@ -462,7 +468,8 @@ And answer according to the language of the user's question.
 Given the context information, answer the query.
 Query: [query]"""
 
-RAG_OPENAI_API_BASE_URL = os.getenv("RAG_OPENAI_API_BASE_URL", OPENAI_API_BASE_URL)
+RAG_OPENAI_API_BASE_URL = os.getenv(
+    "RAG_OPENAI_API_BASE_URL", OPENAI_API_BASE_URL)
 RAG_OPENAI_API_KEY = os.getenv("RAG_OPENAI_API_KEY", OPENAI_API_KEY)
 
 ####################################
@@ -470,7 +477,10 @@ RAG_OPENAI_API_KEY = os.getenv("RAG_OPENAI_API_KEY", OPENAI_API_KEY)
 ####################################
 
 WHISPER_MODEL = os.getenv("WHISPER_MODEL", "base")
-WHISPER_MODEL_DIR = os.getenv("WHISPER_MODEL_DIR", f"{CACHE_DIR}/whisper/models")
+WHISPER_MODEL_DIR = os.getenv(
+    "WHISPER_MODEL_DIR",
+    f"{CACHE_DIR}/whisper/models"
+)
 WHISPER_MODEL_AUTO_UPDATE = (
     os.environ.get("WHISPER_MODEL_AUTO_UPDATE", "").lower() == "true"
 )
@@ -497,7 +507,8 @@ IMAGES_OPENAI_API_KEY = os.getenv("IMAGES_OPENAI_API_KEY", OPENAI_API_KEY)
 # Audio
 ####################################
 
-AUDIO_OPENAI_API_BASE_URL = os.getenv("AUDIO_OPENAI_API_BASE_URL", OPENAI_API_BASE_URL)
+AUDIO_OPENAI_API_BASE_URL = os.getenv(
+    "AUDIO_OPENAI_API_BASE_URL", OPENAI_API_BASE_URL)
 AUDIO_OPENAI_API_KEY = os.getenv("AUDIO_OPENAI_API_KEY", OPENAI_API_KEY)
 
 ####################################
@@ -508,3 +519,9 @@ LITELLM_PROXY_PORT = int(os.getenv("LITELLM_PROXY_PORT", "14365"))
 if LITELLM_PROXY_PORT < 0 or LITELLM_PROXY_PORT > 65535:
     raise ValueError("Invalid port number for LITELLM_PROXY_PORT")
 LITELLM_PROXY_HOST = os.getenv("LITELLM_PROXY_HOST", "127.0.0.1")
+
+
+####################################
+# PAPAREO
+####################################
+PAPAREO_TOKEN = os.getenv("PAPAREO_TOKEN", "")

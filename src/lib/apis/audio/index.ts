@@ -30,6 +30,7 @@ export const getAudioConfig = async (token: string) => {
 type OpenAIConfigForm = {
 	url: string;
 	key: string;
+	papareo_token: string;
 };
 
 export const updateAudioConfig = async (token: string, payload: OpenAIConfigForm) => {
@@ -95,7 +96,8 @@ export const transcribeAudio = async (token: string, file: File) => {
 export const synthesizeOpenAISpeech = async (
 	token: string = '',
 	speaker: string = 'alloy',
-	text: string = ''
+	text: string = '',
+	voice_speed: number = 1
 ) => {
 	let error = null;
 
@@ -132,7 +134,8 @@ export const synthesizeOpenAISpeech = async (
 export const synthesizePapaReo = async (
 	token: string = '',
 	speaker: string = 'pita',
-	text: string = ''
+	text: string = '',
+	voice_speed: number = 1
 ) => {
 	let error = null;
 
@@ -143,7 +146,7 @@ export const synthesizePapaReo = async (
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
-			speed: 1,
+			speed: voice_speed,
 			text: text,
 			voice_id: speaker,
 			response_type: "stream"

@@ -224,7 +224,8 @@
 					const res = await speechAPI(
 						$settings?.audio?.api_token,
 						$settings?.audio?.speaker,
-						sentence
+						sentence,
+						$settings?.audio?.voice_speed
 					).catch((error) => {
 						toast.error(error);
 

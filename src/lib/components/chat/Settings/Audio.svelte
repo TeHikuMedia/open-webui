@@ -27,6 +27,7 @@
 	let voices = [];
 	let speaker = '';
 	let api_token = '';
+	let voice_speed = 1;
 
 	const getOpenAIVoices = () => {
 		voices = [
@@ -83,12 +84,14 @@
 		if (TTSEngine === 'openai') {
 			const res = await updateAudioConfig(localStorage.token, {
 				url: OpenAIUrl,
-				key: OpenAIKey
+				key: OpenAIKey,
+				papareo_token: api_token
 			});
 
 			if (res) {
 				OpenAIUrl = res.OPENAI_API_BASE_URL;
 				OpenAIKey = res.OPENAI_API_KEY;
+				api_token = res.PAPAREO_TOKEN;
 			}
 		}
 	};
@@ -100,10 +103,11 @@
 		speechAutoSend = settings.speechAutoSend ?? false;
 		responseAutoPlayback = settings.responseAutoPlayback ?? false;
 
-		STTEngine = settings?.audio?.STTEngine ?? '';
-		TTSEngine = settings?.audio?.TTSEngine ?? '';
+		STTEngine = settings?.audio?.STTEngine ?? 'papareo';
+		TTSEngine = settings?.audio?.TTSEngine ?? 'papareo';
 		speaker = settings?.audio?.speaker ?? '';
 		api_token = settings?.audio?.api_token ?? localStorage.token;
+		voice_speed = settings?.audio?.voice_speed ?? 1;
 
 		if (TTSEngine === 'openai') {
 			getOpenAIVoices();
@@ -119,6 +123,7 @@
 			if (res) {
 				OpenAIUrl = res.OPENAI_API_BASE_URL;
 				OpenAIKey = res.OPENAI_API_KEY;
+				api_token = res.PAPAREO_TOKEN;
 			}
 		}
 	});
@@ -135,7 +140,8 @@
 				STTEngine: STTEngine !== '' ? STTEngine : undefined,
 				TTSEngine: TTSEngine !== '' ? TTSEngine : undefined,
 				speaker: speaker !== '' ? speaker : undefined,
-				api_token: api_token !== '' ? api_token : undefined
+				api_token: api_token !== '' ? api_token : undefined,
+				voice_speed: voice_speed
 			}
 		});
 		dispatch('save');
@@ -278,6 +284,12 @@
 							class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
 							placeholder={$i18n.t('API Token')}
 							bind:value={api_token}
+							required
+						/>
+						<input
+							class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
+							placeholder={$i18n.t('Speed')}
+							bind:value={voice_speed}
 							required
 						/>
 					</div>
