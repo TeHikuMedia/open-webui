@@ -139,7 +139,7 @@ export const synthesizePapaReo = async (
 ) => {
 	let error = null;
 
-	const res = await fetch(`https://api.papareo.io/reo/synthesize`, {
+	const res = await fetch(`https://staging-api.papareo.io/reo/synthesize`, {
 		method: 'POST',
 		headers: {
 			Authorization: `Token ${token}`,
@@ -180,7 +180,7 @@ export const transcribePapaReo = async (token: string, file: File) => {
 	data.append('audio_file', file);
 
 	let error = null;
-	const res = await fetch(`https://api.papareo.io/tuhi/transcribe`, {
+	const res = await fetch(`https://staging-api.papareo.io/tuhi/transcribe`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',
