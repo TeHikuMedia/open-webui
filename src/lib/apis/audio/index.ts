@@ -1,4 +1,5 @@
 import { AUDIO_API_BASE_URL } from '$lib/constants';
+import { Client } from "@gradio/client";
 
 export const getAudioConfig = async (token: string) => {
 	let error = null;
@@ -139,35 +140,48 @@ export const synthesizePapaReo = async (
 ) => {
 	let error = null;
 
-	const res = await fetch(`https://staging-api.papareo.io/reo/synthesize`, {
-		method: 'POST',
-		headers: {
-			Authorization: `Token ${token}`,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			speed: voice_speed,
-			text: text,
-			voice_id: speaker,
-			response_type: "stream"
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res;
-		})
-		.catch((err) => {
-			error = err.detail;
-			console.log(err);
 
-			return null;
-		});
 
-	if (error) {
-		throw error;
-	}
+	const client = await Client.connect("https://reo-hou.papareo.io/");
+	const result = await client.predict("/synth_haw", {
+		text: token,
+		speed: voice_speed,
+		filter_factor: 0,
+	});
 
-	return res;
+	console.log(result.data as unknown[]);
+	let data = result.data as unknown[]
+	return URL.createObjectURL(data[1] as Blob)
+
+	// const res = await fetch(`https://staging-api.papareo.io/reo/synthesize`, {
+	// 	method: 'POST',
+	// 	headers: {
+	// 		Authorization: `Token ${token}`,
+	// 		'Content-Type': 'application/json'
+	// 	},
+	// 	body: JSON.stringify({
+	// 		speed: voice_speed,
+	// 		text: text,
+	// 		voice_id: speaker,
+	// 		response_type: "stream"
+	// 	})
+	// })
+	// 	.then(async (res) => {
+	// 		if (!res.ok) throw await res.json();
+	// 		return res;
+	// 	})
+	// 	.catch((err) => {
+	// 		error = err.detail;
+	// 		console.log(err);
+
+	// 		return null;
+	// 	});
+
+	// if (error) {
+	// 	throw error;
+	// }
+
+	// return res;
 };
 
 
