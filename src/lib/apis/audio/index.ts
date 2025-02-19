@@ -140,18 +140,21 @@ export const synthesizePapaReo = async (
 ) => {
 	let error = null;
 
-
-
+	text = text.replace(/<.*>(.|\n)*?<\/.*>/, '')
 	const client = await Client.connect("https://reo-hou.papareo.io/");
-	const result = await client.predict("/synth_haw", {
-		text: token,
-		speed: voice_speed,
-		filter_factor: 0,
-	});
 
-	console.log(result.data as unknown[]);
-	let data = result.data as unknown[]
-	return URL.createObjectURL(data[1] as Blob)
+	try {
+		const result = await client.predict("/synth_haw", {
+			text: token,
+			speed: voice_speed,
+			filter_factor: 0,
+		})
+		console.log(result.data as unknown[]);
+		let data = result.data as unknown[]
+		return URL.createObjectURL(data[1] as Blob)
+	} catch (e) {
+		return null;
+	}
 
 	// const res = await fetch(`https://staging-api.papareo.io/reo/synthesize`, {
 	// 	method: 'POST',
