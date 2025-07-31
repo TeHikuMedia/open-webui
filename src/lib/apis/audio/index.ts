@@ -141,50 +141,51 @@ export const synthesizePapaReo = async (
 	let error = null;
 
 	text = text.replace(/<.*>(.|\n)*?<\/.*>/, '')
-	const client = await Client.connect("https://reo-hou.papareo.io/");
 
-	try {
-		const result = await client.predict("/synth_haw", {
-			text: token,
-			speed: voice_speed,
-			filter_factor: 0,
-		})
-		console.log(result.data as unknown[]);
-		let data = result.data as unknown[]
-		return URL.createObjectURL(data[1] as Blob)
-	} catch (e) {
-		return null;
-	}
+	// const client = await Client.connect("https://reo-hou.papareo.io/");
 
-	// const res = await fetch(`https://staging-api.papareo.io/reo/synthesize`, {
-	// 	method: 'POST',
-	// 	headers: {
-	// 		Authorization: `Token ${token}`,
-	// 		'Content-Type': 'application/json'
-	// 	},
-	// 	body: JSON.stringify({
+	// try {
+	// 	const result = await client.predict("/synth_haw", {
+	// 		text: token,
 	// 		speed: voice_speed,
-	// 		text: text,
-	// 		voice_id: speaker,
-	// 		response_type: "stream"
+	// 		filter_factor: 0,
 	// 	})
-	// })
-	// 	.then(async (res) => {
-	// 		if (!res.ok) throw await res.json();
-	// 		return res;
-	// 	})
-	// 	.catch((err) => {
-	// 		error = err.detail;
-	// 		console.log(err);
-
-	// 		return null;
-	// 	});
-
-	// if (error) {
-	// 	throw error;
+	// 	console.log(result.data as unknown[]);
+	// 	let data = result.data as unknown[]
+	// 	return URL.createObjectURL(data[1] as Blob)
+	// } catch (e) {
+	// 	return null;
 	// }
 
-	// return res;
+	const res = await fetch(`https://api.papareo.io/reo/synthesize`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Token ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			speed: voice_speed,
+			text: text,
+			voice_id: speaker,
+			response_type: "stream"
+		})
+	})
+		.then(async (res) => {
+			if (!res.ok) throw await res.json();
+			return res;
+		})
+		.catch((err) => {
+			error = err.detail;
+			console.log(err);
+
+			return null;
+		});
+
+	if (error) {
+		throw error;
+	}
+
+	return res;
 };
 
 
@@ -197,7 +198,7 @@ export const transcribePapaReo = async (token: string, file: File) => {
 	data.append('audio_file', file);
 
 	let error = null;
-	const res = await fetch(`https://staging-api.papareo.io/tuhi/transcribe`, {
+	const res = await fetch(`https://api.papareo.io/tuhi/transcribe`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',
